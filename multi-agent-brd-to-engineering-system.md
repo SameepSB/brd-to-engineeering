@@ -86,7 +86,7 @@ Chunking strategy (per source type) to be documented , metadata schema, embeddin
 Every non-trivial claim in a generated artifact should cite at least one retrieved chunk.
 
 # 7. Evaluation Framework
-**to be build own eval dataset alongside the system.** Cover the range of expected inputs (simple, medium, complex BRDs) plus edge cases (missing NFRs, contradictions, ambiguity). Aim for roughly 3–5 BRDs with expected outputs, a handful of expert-scored Critic assessments for calibration, and a few intentional-issue BRDs to test guardrails.
+**To be build own eval dataset alongside the system.** Cover the range of expected inputs (simple, medium, complex BRDs) plus edge cases (missing NFRs, contradictions, ambiguity). Aim for roughly 3–5 BRDs with expected outputs, a handful of expert-scored Critic assessments for calibration, and a few intentional-issue BRDs to test guardrails.
 
 ## 7A. Evaluation Methods (implement at least 2)
 - **Rule-based:** structural checks, schema compliance, BRD section coverage.

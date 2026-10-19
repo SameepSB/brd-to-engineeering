@@ -18,7 +18,7 @@ Your task is to build a multi-agent system that transforms a raw BRD into a comp
 - **Evaluated outputs:** Outputs carry Green / Amber / Red quality badges — not just generated-and-displayed.
 - **EM enablement:** Decision-ready artifacts with source citations, not drafts from scratch.
 
-# 2. Curriculum Concepts You Will Apply
+# 2. Curriculum Concepts to Apply
 This project is designed as an integrative exercise. Every major curriculum concept appears in a concrete, measurable form within the system.
 
 | Curriculum Area | Where It Applies in This Project | Mandatory / Stretch |
@@ -40,7 +40,7 @@ This project is designed as an integrative exercise. Every major curriculum conc
 | Fine-Tuning | Fine-tune a smaller model on BRD section classification or plan structure generation | Stretch |
 
 # 3. Technical Architecture
-The system is organized into four layers. How you implement each is your choice — document the tools and models you pick.
+The system is organized into four layers. How implement each of choice — document the tools and models is  picked.
 
 | Layer | Responsibility |
 | :- | :- |
@@ -50,10 +50,10 @@ The system is organized into four layers. How you implement each is your choice 
 | 4. Validation & Evaluation | Score outputs, enforce revisions, present quality badges to the EM. |
 
 - **Tool tracks:** code (Python + LangChain / LlamaIndex / LangGraph) for full programmatic control. The architecture below is tool-agnostic.
-- **Data flow:** BRD in → parse → route to specialist agents → retrieve RAG context → generate → Critic review (with revisions) → evaluate → HITL approval → export. You design the exact hand-offs, error handling, and state management.
+- **Data flow:** BRD in → parse → route to specialist agents → retrieve RAG context → generate → Critic review (with revisions) → evaluate → HITL approval → export. to be designed the exact hand-offs, error handling, and state management.
 
 # 4. Agent Architecture & Output Contracts
-Your system comprises seven agents. Every agent follows the principle: one role = one job = one output contract. You define the schema that fits your tool track; downstream consumers validate it before proceeding.
+Your system comprises seven agents. Every agent follows the principle: one role = one job = one output contract. Define the schema that fits your tool track; downstream consumers validate it before proceeding.
 
 | # | Agent | Group | Primary Responsibility |
 | :- | :- | :- | :- |
@@ -71,7 +71,7 @@ Your system comprises seven agents. Every agent follows the principle: one role 
 Choose and justify one orchestration pattern from the curriculum: hub-and-spoke (recommended — a central Orchestrator dispatches to specialists and aggregates), sequential pipeline, hierarchical, or message graph. In your documentation explain why it fits, how error / fallback handling works, and what would change if the system scaled to 50+ BRDs per week.
 
 # 6. RAG Pipeline
-**You build your own knowledge base.** This is part of the work, not a handout. Synthetic content is fine. Cover enough variety that retrieval genuinely discriminates between good and bad matches.
+** build knowledge base.** This is part of the work, not a handout. Synthetic content is fine. Cover enough variety that retrieval genuinely discriminates between good and bad matches.
 
 Suggested sources to create (roughly):
 - Past BRDs — 2–3 samples of varying complexity.
@@ -86,7 +86,7 @@ Document your chunking strategy (per source type), metadata schema, embedding mo
 Every non-trivial claim in a generated artifact should cite at least one retrieved chunk.
 
 # 7. Evaluation Framework
-**You build your own eval dataset alongside the system.** Cover the range of expected inputs (simple, medium, complex BRDs) plus edge cases (missing NFRs, contradictions, ambiguity). Aim for roughly 3–5 BRDs with expected outputs, a handful of expert-scored Critic assessments for calibration, and a few intentional-issue BRDs to test guardrails.
+**to be build own eval dataset alongside the system.** Cover the range of expected inputs (simple, medium, complex BRDs) plus edge cases (missing NFRs, contradictions, ambiguity). Aim for roughly 3–5 BRDs with expected outputs, a handful of expert-scored Critic assessments for calibration, and a few intentional-issue BRDs to test guardrails.
 
 ## 7A. Evaluation Methods (implement at least 2)
 - **Rule-based:** structural checks, schema compliance, BRD section coverage.

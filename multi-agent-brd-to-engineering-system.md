@@ -18,7 +18,7 @@ Task is to build a multi-agent system that transforms a raw BRD into a complete 
 - **Evaluated outputs:** Outputs carry Green / Amber / Red quality badges — not just generated-and-displayed.
 - **EM enablement:** Decision-ready artifacts with source citations, not drafts from scratch.
 
-# 2. Concepts to Apply
+# 2. Curriculum Concepts to Apply
 This project is designed as an integrative exercise. Every major curriculum concept appears in a concrete, measurable form within the system.
 
 | Curriculum Area | Where It Applies in This Project | Mandatory / Stretch |

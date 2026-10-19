@@ -68,7 +68,7 @@ System need to be comprises seven agents. Every agent follows the principle: one
 **Critic behavior.** Every output from Planning and Design groups passes through the Critic. If any rubric dimension falls below threshold, the Critic sends specific feedback to the originating agent for revision. Cap revisions at two cycles; beyond that, flag to the EM with an Amber / Red badge. The Critic also checks cross-agent consistency (does the schedule align with architecture complexity? does tech-stack familiarity match the timeline?).
 
 # 5. Orchestration
-Choose and justify one orchestration pattern from the curriculum: hub-and-spoke (recommended — a central Orchestrator dispatches to specialists and aggregates), sequential pipeline, hierarchical, or message graph. In your documentation explain why it fits, how error / fallback handling works, and what would change if the system scaled to 50+ BRDs per week.
+Choose and justify one orchestration pattern from the curriculum: hub-and-spoke (recommended — a central Orchestrator dispatches to specialists and aggregates), sequential pipeline, hierarchical, or message graph. documentation should explain why it fits, how error / fallback handling works, and what would change if the system scaled to 50+ BRDs per week.
 
 # 6. RAG Pipeline
 ** build knowledge base.** This is part of the work, not a handout. Synthetic content is fine. Cover enough variety that retrieval genuinely discriminates between good and bad matches.

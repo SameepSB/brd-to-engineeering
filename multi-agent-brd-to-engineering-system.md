@@ -4,9 +4,7 @@
 
 | Parameter | Details |
 | :- | :- |
-| Duration | 2 weeks |
-| Mode | Individual |
-| Tools | n8n / Langflow / Python (Colab / Jupyter) — your choice |
+| Tools | Python (Colab / Jupyter) |
 | Core Agents | 7 specialized agents |
 
 # 1. Business Use Case

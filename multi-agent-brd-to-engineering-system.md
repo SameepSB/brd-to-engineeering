@@ -49,7 +49,7 @@ The system is organized into four layers. How you implement each is your choice 
 | 3. Multi-Agent Generation | Run specialist agents to produce plans, schedules, architecture, PoC, tech-stack options. |
 | 4. Validation & Evaluation | Score outputs, enforce revisions, present quality badges to the EM. |
 
-- **Tool tracks:** Low-code (n8n + Langflow) for visual DAGs, or code (Python + LangChain / LlamaIndex / LangGraph) for full programmatic control. The architecture below is tool-agnostic.
+- **Tool tracks:** code (Python + LangChain / LlamaIndex / LangGraph) for full programmatic control. The architecture below is tool-agnostic.
 - **Data flow:** BRD in → parse → route to specialist agents → retrieve RAG context → generate → Critic review (with revisions) → evaluate → HITL approval → export. You design the exact hand-offs, error handling, and state management.
 
 # 4. Agent Architecture & Output Contracts
@@ -125,7 +125,7 @@ BRDs often contain proprietary business logic. Implement the following guardrail
 # 9. Operationalization & Monitoring
 **Define success and failure upfront.** At least three measurable success criteria and at least three failure modes with mitigations. Examples: completeness check passes on all BRD sections; actionability score ≥ 4 / 5 on the eval dataset; end-to-end pipeline under 5 minutes. Failure modes: malformed JSON (retry then escalate), no RAG hits (proceed with disclaimer + Amber badge), Critic loop stuck (hard cap at 2 cycles).
 
-**Logging.** For every agent execution, log: input (hashed if sensitive), RAG chunks retrieved, output produced, Critic score, execution time, guardrail triggers, revision count. Use n8n's execution log or structured JSON — your choice.
+**Logging.** For every agent execution, log: input (hashed if sensitive), RAG chunks retrieved, output produced, Critic score, execution time, guardrail triggers, revision count. Use structured JSON —log.
 
 # 10. Deliverables
 ## Working Prototype (mandatory)

@@ -1,5 +1,5 @@
 # Applied Agentic AI for Engineering Managers
-**CAPSTONE PROJECT 1**  
+
 **Multi-Agent BRD-to-Engineering System**
 
 | Parameter | Details |
@@ -21,7 +21,7 @@ Your task is to build a multi-agent system that transforms a raw BRD into a comp
 - **EM enablement:** Decision-ready artifacts with source citations, not drafts from scratch.
 
 # 2. Curriculum Concepts You Will Apply
-This capstone is designed as an integrative exercise. Every major curriculum concept appears in a concrete, measurable form within the system.
+This project is designed as an integrative exercise. Every major curriculum concept appears in a concrete, measurable form within the system.
 
 | Curriculum Area | Where It Applies in This Project | Mandatory / Stretch |
 | :- | :- | :- |

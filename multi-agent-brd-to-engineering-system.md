@@ -9,7 +9,7 @@
 
 # 1. Business Use Case
 Engineering Managers (EMs) face a persistent bottleneck in translating complex BRDs into structured technical plans and architecture. This manual process results in delays, misalignment between business intent and engineering execution, and inconsistent scoping across teams.  
-Your task is to build a multi-agent system that transforms a raw BRD into a complete set of engineering artifacts — plans, schedules, architecture, PoC scope, and tech-stack recommendations — all grounded in organizational knowledge, validated by a Critic Agent, and evaluated with quality badges before reaching the EM.
+Task is to build a multi-agent system that transforms a raw BRD into a complete set of engineering artifacts — plans, schedules, architecture, PoC scope, and tech-stack recommendations — all grounded in organizational knowledge, validated by a Critic Agent, and evaluated with quality badges before reaching the EM.
 
 ## The Opportunity
 - **Faster turnaround:** RAG-augmented agents reference past projects and org templates instead of producing generic boilerplate.
@@ -53,7 +53,7 @@ The system is organized into four layers. How implement each of choice — docum
 - **Data flow:** BRD in → parse → route to specialist agents → retrieve RAG context → generate → Critic review (with revisions) → evaluate → HITL approval → export. to be designed the exact hand-offs, error handling, and state management.
 
 # 4. Agent Architecture & Output Contracts
-Your system comprises seven agents. Every agent follows the principle: one role = one job = one output contract. Define the schema that fits your tool track; downstream consumers validate it before proceeding.
+System need to be comprises seven agents. Every agent follows the principle: one role = one job = one output contract. Define the schema that fits the tool track; downstream consumers validate it before proceeding.
 
 | # | Agent | Group | Primary Responsibility |
 | :- | :- | :- | :- |
@@ -81,7 +81,7 @@ Suggested sources to create (roughly):
 - Org engineering standards — a short document covering approved stacks, coding standards, CI/CD, security, architecture review criteria.
 - Tech-stack decision log — 10–15 past decisions with rationale and outcome.
 
-Document your chunking strategy (per source type), metadata schema, embedding model choice (cost vs. quality), vector-DB choice (local like Chroma/FAISS or cloud like Pinecone/Qdrant), and retrieval parameters (top_k, similarity threshold, metadata filters). Explain your reasoning — why this chunk size, why this metadata, how it affects retrieval quality.
+Chunking strategy (per source type) to be documented , metadata schema, embedding model choice (cost vs. quality), vector-DB choice (local like Chroma/FAISS or cloud like Pinecone/Qdrant), and retrieval parameters (top_k, similarity threshold, metadata filters). Explain the reasoning — why this chunk size, why this metadata, how it affects retrieval quality.
 
 Every non-trivial claim in a generated artifact should cite at least one retrieved chunk.
 
@@ -109,7 +109,7 @@ Every non-trivial claim in a generated artifact should cite at least one retriev
 Connect Critic feedback to agent revisions. Track revision count and score-per-revision. Show at least one concrete example of an output improving after Critic feedback. Document how Critic scores are tracked and how they drive revision decisions.
 
 ## 7D. Cycle Improvement Metrics
-Demonstrate measurable improvement on at least two metrics, either revision-to-revision within one BRD or across two BRDs. Candidates: artifact quality score (rule-based pass rate), groundedness score, actionability score, cross-agent consistency, guardrail trigger count. Include a side-by-side comparison table in your eval report and narrate what changed and why.
+Demonstrate measurable improvement on at least two metrics, either revision-to-revision within one BRD or across two BRDs. Candidates: artifact quality score (rule-based pass rate), groundedness score, actionability score, cross-agent consistency, guardrail trigger count. There should be side-by-side comparison table in the eval report and narrate what changed and why.
 
 # 8. Guardrails, Safety & Responsible AI
 BRDs often contain proprietary business logic. Implement the following guardrails:
@@ -138,7 +138,7 @@ Architecture overview · agent contract reference (schemas + who consumes what) 
 Architecture walkthrough · BRD upload and parsing · RAG retrieval · agent outputs with citations · Critic review cycle with before / after scores · guardrails firing · evaluation scores and badges · operationalization summary · any stretch features.
 
 # 11. Suggested Weekly Timeline
-This timeline is a recommendation, not a mandate. Adapt it to your working style, but ensure all deliverables are complete by the submission deadline.
+This timeline is a recommendation, not a mandate. Adapt it to the  working style, but ensure all deliverables are complete by the submission deadline.
 
 ## Week 1: Design, Build, and First Full Run
 | Phase | Days | Activities | Deliverables by End of Phase |

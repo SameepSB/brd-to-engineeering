@@ -39,7 +39,7 @@ result = run_workflow(brd.read_text(encoding="utf-8"), brd.name)
 print(result.aggregate_badge, result.critic.findings)
 ```
 
-See [the Google Colab notebook](notebooks/demo.ipynb) for an interactive walkthrough. In Colab, upload or clone the repository, set the notebook working directory to its root, install with `%pip install -e ".[dev]"`, then run all cells. The notebook uses only the included fabricated BRD and local provider.
+See [the Google Colab notebook](notebooks/demo.ipynb) for an interactive walkthrough. In Colab, upload or clone the repository, install with `%pip install -e ".[dev]"`, then run all cells. The notebook uses only the included fabricated BRD and local provider.
 
 ## Architecture
 

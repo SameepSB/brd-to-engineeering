@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "store": "qdrant-local",
+  "embedding_model": "local-hash-v1",
+  "top_k": 4,
+  "similarity_threshold": 0.12,
+  "metric": "expected_chunk_recall_at_k",
+  "threshold": 1.0,
+  "cases": [
+    {
+      "query": "source requirement approval exact artifact revisions",
+      "expected_chunk_ids": [
+        "KNOW-DECISION-RECORDS-chunk-1000841052cc",
+        "KNOW-ORGANIZATION-HISTORY-chunk-a6bc2fb55831",
+        "KNOW-SYNTHETIC-PROJECT-BRIEF-chunk-145f770b4206"
+      ]
+    },
+    {
+      "query": "team phases milestones delivery plan risk",
+      "expected_chunk_ids": ["KNOW-PLAN-TEMPLATE-chunk-42e29d3da9d0"]
+    },
+    {
+      "query": "cosmic banana orbital pastry",
+      "expected_chunk_ids": []
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brd-engineering-prototype"
+version = "0.1.0"
+description = "Offline-ready, reviewable BRD-to-engineering prototype"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "langgraph==1.2.16",
+  "pydantic==2.14.1",
+  "qdrant-client==1.19.1",
+  "streamlit==1.66.0",
+]
+
+[project.optional-dependencies]
+openai = ["openai==2.14.0"]
+dev = ["pytest==9.1.1"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

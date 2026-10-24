@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "rubric_version": "1.0",
+  "cases": [
+    {
+      "id": "simple",
+      "file": "simple.md",
+      "complexity": "simple",
+      "expected": ["all source sections covered", "requirements retain source IDs"]
+    },
+    {
+      "id": "medium",
+      "file": "medium.md",
+      "complexity": "medium",
+      "expected": ["authenticated-access requirement preserved", "approval is explicit"]
+    },
+    {
+      "id": "complex",
+      "file": "complex.md",
+      "complexity": "complex",
+      "expected": ["dependency order retained", "revision limit enforced", "export approval is revision-bound"]
+    },
+    {
+      "id": "edge-cases",
+      "file": "edge-cases.md",
+      "complexity": "edge",
+      "expected": ["missing NFR question recorded", "contradiction flagged", "ambiguity flagged"]
+    }
+  ]
+}

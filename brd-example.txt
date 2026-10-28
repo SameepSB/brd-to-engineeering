@@ -1,0 +1,67 @@
+Business Requirements Document: Saved Payment Methods
+1. Executive Summary
+Business problem: Returning customers must re-enter their payment card details at checkout. This adds friction, lengthens checkout, and may contribute to cart abandonment.
+
+Project goal: Let authenticated customers opt in to saving a payment method through the existing payment gateway, then view and manage saved methods in their account and select one at checkout.
+
+Expected outcome: Reduce checkout friction and improve checkout completion. The proposed target is to raise checkout completion from 52% to 64% within three months of launch, and reduce average checkout time for returning customers from 90 seconds to 45 seconds.
+
+2. Business Objectives and Success Measures
+Checkout completion: Increase the checkout completion rate from 52% to 64% within three months after launch.
+Checkout duration: Reduce average checkout duration for returning customers from 90 seconds to 45 seconds.
+Payment data handling: Use the payment gateway’s tokenization service. The company’s systems must not store raw card numbers (PAN) or CVV, or include them in logs.
+Security and compliance: Have the security and compliance team review the implementation against applicable PCI DSS obligations before release. Tokenization may reduce compliance scope, but does not by itself establish PCI DSS compliance.
+3. Stakeholders
+Stakeholder	Responsibility
+VP of E-Commerce	Project sponsor, budget, and final business sign-off
+Product Manager / Business Analyst	Owns business requirements and acceptance
+Lead Software Engineer / Architect	Assesses feasibility and produces the functional and technical design
+Security & Compliance Officer	Reviews payment-data handling and compliance requirements
+4. Scope
+In scope
+
+An explicit customer opt-in to save a payment method during checkout.
+A saved-payment section in the authenticated customer account.
+Displaying saved methods using masked details, such as card brand and last four digits.
+Setting a saved method as the customer’s default and deleting saved methods.
+Integrating with the existing payment gateway to tokenize and manage saved methods.
+Allowing authenticated customers to select an eligible saved method at checkout.
+Out of scope
+
+Saving payment methods for guest users who are not signed in.
+Storing raw PAN or CVV in company databases, logs, or application systems.
+5. Current and Future State
+Current state: A customer proceeds to checkout and manually enters card details for each purchase.
+
+Future state: An authenticated customer can choose to save a payment method through an explicit opt-in. On a later purchase, the customer can select an eligible saved method at checkout. The customer can view, change the default, or delete saved methods in their account.
+
+6. Business Requirements
+BR-01 — Customer consent: The system must ask the customer for explicit consent before saving a payment method.
+BR-02 — Tokenization: The system must use the existing payment gateway’s tokenization capability. It must not store raw PAN or CVV.
+BR-03 — Saved-method display: The account wallet must show enough masked information for customers to identify a saved method without revealing full card details.
+BR-04 — Wallet management: Customers must be able to set a saved method as their default and delete saved methods.
+BR-05 — Checkout selection: Authenticated customers must be able to select an eligible saved method at checkout, subject to payment-gateway and security requirements.
+BR-06 — Data protection: PAN and CVV must not be written to company databases or logs. CVV must not be retained after authorization.
+BR-07 — Compliance review: The payment flow and data handling must be reviewed by the Security & Compliance Officer before launch.
+7. Assumptions and Dependencies
+Assumptions
+
+Customers who save payment methods have an account and are authenticated.
+Customers can choose whether to save a method; saving is not required to complete a purchase.
+Dependencies
+
+The existing payment gateway supports tokenization and the required lifecycle operations for saved methods.
+The gateway provides masked display details and a documented method to revoke or delete saved payment tokens.
+Security and compliance review is completed before release.
+8. Acceptance Criteria
+Given an authenticated customer is checking out, when they explicitly opt in to saving their payment method and the payment succeeds, then the method is available in their account wallet in masked form.
+Given a customer has a saved payment method, when they open their account wallet, then they can identify the method without seeing its full card number or CVV.
+Given a customer has multiple saved methods, when they set one as the default, then the wallet reflects that choice and checkout uses it as the default selection where supported.
+Given a customer deletes a saved method, when the deletion succeeds, then that method is no longer available in the wallet or for future checkout selection.
+Given payment data is processed, when application data and logs are inspected, then no raw PAN or CVV is stored or logged.
+Given the payment flow is ready for release, when the security and compliance review occurs, then the reviewer can verify the tokenization flow and applicable PCI DSS controls.
+9. Open Decisions
+Conversion target: Does “increase by 12%” mean a 12-percentage-point increase from 52% to 64%, or a 12% relative increase (to approximately 58.2%)?
+CVV at checkout: Must customers enter CVV when using a saved method, or does the gateway’s policy allow it to be omitted? CVV must not be stored.
+Gateway details: Which gateway and tokenization API will be used, and what are its requirements for saving, displaying, and deleting payment methods?
+Measurement: How will checkout completion and checkout duration be defined, segmented, and measured against the stated baseline?

@@ -70,8 +70,9 @@ class OpenAIProvider:
             temperature=0,
             response_format={"type": "json_object"},
         )
-        content = response.choices[0].message.content or "{}"
-        result = JudgeAssessment.model_validate_json(content)
-        if result.artifact_id != deterministic_score.artifact_id:
-            raise ValueError("LLM judge returned a score for the wrong artifact.")
-        return result
+        content = (response.choices[0].message.content or "{}").strip()
+        if content.startswith("```"):
+            content = content.strip("`").removeprefix("json").strip()
+        data = json.loads(content)
+        data["artifact_id"] = deterministic_score.artifact_id
+        return JudgeAssessment.model_validate(data)

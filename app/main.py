@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -90,8 +91,28 @@ if result is not None:
                 f"{requirement.source_locator}): {requirement.text}"
             )
 
+    def _json_bytes(data) -> str:
+        return json.dumps(data, indent=2, ensure_ascii=False, default=str)
+
+    artifacts_report = {role: a.model_dump(mode="json") for role, a in result.artifacts.items()}
+    critic_report = {
+        "critic_findings": [f.model_dump(mode="json") for f in result.critic.findings],
+        "rule_scores": {
+            key: [s.model_dump(mode="json") for s in value] for key, value in result.revision_history.items()
+        },
+        "evaluation": result.evaluation,
+    }
+    operations_report = [item.model_dump(mode="json") for item in result.operational_records]
+
     tabs = st.tabs(["Artifacts", "Critic & evaluation", "Operations"])
     with tabs[0]:
+        st.download_button(
+            "Download artifacts report (JSON)",
+            _json_bytes(artifacts_report),
+            file_name=f"{result.run_id}-artifacts.json",
+            mime="application/json",
+            key="dl_artifacts",
+        )
         for role, artifact in result.artifacts.items():
             with st.expander(f"{role.replace('_', ' ').title()} — {artifact.badge}, revision {artifact.revision}", expanded=True):
                 st.write(f"**Artifact ID:** `{artifact.artifact_id}` · Contract `{artifact.contract_version}`")
@@ -111,6 +132,13 @@ if result is not None:
                 st.json(artifact.model_dump(mode="json"))
 
     with tabs[1]:
+        st.download_button(
+            "Download critic & evaluation report (JSON)",
+            _json_bytes(critic_report),
+            file_name=f"{result.run_id}-critic-evaluation.json",
+            mime="application/json",
+            key="dl_critic",
+        )
         st.write("**Critic findings**")
         st.json([finding.model_dump(mode="json") for finding in result.critic.findings])
         st.write("**Rule scores by artifact and revision**")
@@ -119,7 +147,14 @@ if result is not None:
         st.json(result.evaluation)
 
     with tabs[2]:
-        st.json([item.model_dump(mode="json") for item in result.operational_records])
+        st.download_button(
+            "Download operations report (JSON)",
+            _json_bytes(operations_report),
+            file_name=f"{result.run_id}-operations.json",
+            mime="application/json",
+            key="dl_operations",
+        )
+        st.json(operations_report)
 
     st.subheader("Approval-gated export")
     selected_ids = st.multiselect(

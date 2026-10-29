@@ -4,18 +4,57 @@ An offline-ready prototype that turns a synthetic Business Requirements Document
 
 > **Prototype safety boundary:** Use synthetic or anonymized BRDs. The default provider is deterministic and offline. Do not send real/confidential BRDs to an external provider unless its endpoint and data boundary are approved. Evaluation of this small synthetic dataset is not evidence of production readiness.
 
-## Requirements and setup
+## Quick start (local laptop)
 
-- Python 3.13 or newer
-- Git (only if cloning the repository)
+Prerequisite: Python 3.13 or newer. Check with `python --version`; on Windows, `py -0` lists installed versions. Use the same interpreter for every command below (for example `py -3.14 -m ...` if the default `python` is older).
 
-From the project root in VS Code or a terminal:
+1. Open a terminal in the project root (the folder containing `pyproject.toml`).
+2. Install the project and test tools (first time only):
+   ```powershell
+   python -m pip install -e ".[dev]"
+   ```
+3. Optional check that everything works:
+   ```powershell
+   python -m pytest
+   ```
+4. Start the app:
+   ```powershell
+   python -m streamlit run app/main.py
+   ```
+5. Open <http://localhost:8501> if the browser does not open automatically. Keep "Use included synthetic BRD" ticked (or upload a `.md`/`.txt` BRD), choose a provider, and click **Run review workflow**.
+6. Stop the app with `Ctrl+C` in the terminal.
 
-```powershell
-python -m pip install -e ".[dev]"
-python -m pytest
-streamlit run app/main.py
-```
+### Providers and the LLM
+
+- **Deterministic local (offline), the default:** no LLM is called. Template text and a rule-based judge note are produced locally, with no key or internet needed.
+- **OpenAI (opt-in):** each specialist agent (and each revision) makes one `narrative` call returning a single conservative sentence. The judge makes one call per artifact returning scores as JSON. Both use `gpt-4.1-mini` at `temperature=0`. Citations, requirement links, scoring, badges, and approvals stay deterministic, and any citation that was not retrieved in the run is rejected. To enable it:
+  ```powershell
+  python -m pip install -e ".[openai]"
+  $env:OPENAI_API_KEY="<your key>"      # set in the same terminal; never commit it
+  python -m streamlit run app/main.py
+  ```
+  In the UI choose **OpenAI (opt-in)** and tick the endpoint-approval box, which sets `BRD_ALLOW_EXTERNAL_CONTENT=1` for that process. Selected BRD text is then sent to OpenAI, so use synthetic or authorized data only.
+- **Gemini (opt-in):** same behavior via Google's OpenAI-compatible endpoint (default model `gemini-2.5-flash`; override with `$env:BRD_MODEL`). Uses the same `openai` extra:
+  ```powershell
+  python -m pip install -e ".[openai]"
+  $env:GEMINI_API_KEY="<your key>"
+  python -m streamlit run app/main.py
+  ```
+  Choose **Gemini (opt-in)** in the UI and tick the approval box. BRD text is sent to Google, so use synthetic or authorized data only.
+
+### Run in the notebook (VS Code or Colab)
+
+Open `notebooks/demo.ipynb`, select a Python 3.13+ kernel, and run all cells. The first cell finds the repository root and installs the project into the kernel if dependencies are missing. In Colab, clone or upload the repository first.
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `No module named 'src'` or `'langgraph'` | Run from the repo root and install with `python -m pip install -e ".[dev]"` using the interpreter that runs the app or the notebook kernel. |
+| `Python 3.13+ required` or pip refuses to install | Select or install Python 3.13 or newer and use that interpreter (`py -3.14 -m pip ...`). |
+| `streamlit` is not recognized | Use `python -m streamlit run app/main.py`. |
+| Port 8501 is busy | Add `--server.port 8502`. |
+| OpenAI option errors | Set `OPENAI_API_KEY`, install the `openai` extra, and tick the endpoint-approval box. |
 
 `pyproject.toml` pins the prototype runtime dependencies. No cloud service, API key, or committed secret is needed for the default workflow. The optional remote provider is installed separately with `python -m pip install -e ".[openai]"`; see [Guardrails and operations](docs/guardrails-and-operations.md) before opting in.
 

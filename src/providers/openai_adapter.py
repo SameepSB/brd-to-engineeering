@@ -10,10 +10,15 @@ class OpenAIProvider:
     """Opt-in adapter. The OpenAI SDK is installed via the [openai] extra."""
 
     name = "openai"
+    api_key_env = "OPENAI_API_KEY"
+    base_url: str | None = None
+    default_model = "gpt-4.1-mini"
 
-    def __init__(self, model: str = "gpt-4.1-mini") -> None:
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ValueError("OPENAI_API_KEY is required only when OPENAI mode is explicitly selected.")
+    def __init__(self, model: str | None = None) -> None:
+        model = model or os.getenv("BRD_MODEL") or self.default_model
+        api_key = os.getenv(self.api_key_env)
+        if not api_key:
+            raise ValueError(f"{self.api_key_env} is required only when {self.name} mode is explicitly selected.")
         if os.getenv("BRD_ALLOW_EXTERNAL_CONTENT") != "1":
             raise ValueError(
                 "Set BRD_ALLOW_EXTERNAL_CONTENT=1 only after confirming the configured endpoint "
@@ -23,7 +28,7 @@ class OpenAIProvider:
             from openai import OpenAI
         except ImportError as exc:
             raise RuntimeError('Install the optional dependency with `pip install -e ".[openai]"`.') from exc
-        self._client = OpenAI()
+        self._client = OpenAI(api_key=api_key, base_url=self.base_url)
         self.generation_model = model
         self.evaluation_model = model
 

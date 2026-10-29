@@ -6,6 +6,7 @@ from pathlib import Path
 import streamlit as st
 
 from src.orchestration.graph import run_workflow
+from src.providers.gemini_adapter import GeminiProvider
 from src.providers.openai_adapter import OpenAIProvider
 from src.storage.approval import ApprovalError, approve_run
 from src.tools.export import export_markdown
@@ -17,12 +18,17 @@ st.set_page_config(page_title="BRD-to-engineering prototype", layout="wide")
 st.title("BRD → engineering review")
 st.caption("Synthetic-first prototype. Review evidence, assumptions, uncertainty, badges, and revisions before export.")
 
-provider_mode = st.selectbox("Generation and evaluation provider", ["Deterministic local (offline)", "OpenAI (opt-in)"])
-if provider_mode == "OpenAI (opt-in)":
+provider_mode = st.selectbox("Generation and evaluation provider", ["Deterministic local (offline)", "OpenAI (opt-in)", "Gemini (opt-in)"])
+EXTERNAL = {
+    "OpenAI (opt-in)": ("OpenAI", "OPENAI_API_KEY", OpenAIProvider),
+    "Gemini (opt-in)": ("Gemini", "GEMINI_API_KEY", GeminiProvider),
+}
+if provider_mode in EXTERNAL:
+    label = EXTERNAL[provider_mode][0]
     approved_endpoint = st.checkbox(
-        "I confirm the configured OpenAI endpoint is approved for this BRD and I am using synthetic or authorized data."
+        f"I confirm the configured {label} endpoint is approved for this BRD and I am using synthetic or authorized data."
     )
-    st.warning("Selected BRD text will be sent to the configured OpenAI endpoint. Do not use confidential data without approval.")
+    st.warning(f"Selected BRD text will be sent to the configured {label} endpoint. Do not use confidential data without approval.")
 else:
     approved_endpoint = False
 
@@ -50,15 +56,16 @@ if st.button("Run review workflow", type="primary"):
         if input_error:
             st.error(input_error)
             st.stop()
-        if provider_mode == "OpenAI (opt-in)":
+        if provider_mode in EXTERNAL:
+            label, key_env, provider_cls = EXTERNAL[provider_mode]
             if not approved_endpoint:
                 st.error("Explicit endpoint approval is required before sending BRD content.")
                 st.stop()
-            if not os.environ.get("OPENAI_API_KEY"):
-                st.error("Set OPENAI_API_KEY in the application environment before selecting OpenAI.")
+            if not os.environ.get(key_env):
+                st.error(f"Set {key_env} in the application environment before selecting {label}.")
                 st.stop()
             os.environ["BRD_ALLOW_EXTERNAL_CONTENT"] = "1"
-            provider = OpenAIProvider()
+            provider = provider_cls()
         else:
             from src.providers.deterministic import DeterministicProvider
 

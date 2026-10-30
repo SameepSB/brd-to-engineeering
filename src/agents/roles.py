@@ -119,44 +119,89 @@ def build_artifact(
             else None
         ),
     }
+    template = _template_body(role)
+    generated = _generated_body(role, provider, brd, evidence, upstream_summary, template)
+    body = {**template, **generated}
     if role == "engineering_plan":
-        return PlanArtifact(
-            **common,
-            phases=["Discovery and validation", "Implementation", "Verification and rollout"],
-            milestones=["Requirements approved", "Prototype validated", "Release readiness reviewed"],
-            risks=["Unresolved requirements can change scope and estimates."],
-            team_composition=["Engineering lead", "Application engineer", "Quality engineer"],
-            reflection="Self-review confirms source requirement references and explicitly stated assumptions.",
-        )
+        return PlanArtifact(**common, **body)
     if role == "schedule":
-        return ScheduleArtifact(
-            **common,
-            estimates=["Discovery: 1–2 weeks", "Implementation: 2–4 weeks", "Validation: 1 week"],
-            dependencies=["Requirements approval precedes implementation.", "Implementation precedes validation."],
-            timeline=["Illustrative total: 4–7 weeks; re-estimate after scope approval."],
-            resource_allocation=["Small cross-functional team; availability to be confirmed."],
-        )
+        return ScheduleArtifact(**common, **body)
     if role == "solution_architect":
-        return ArchitectureArtifact(
-            **common,
-            components=["User interface", "Application service", "Data and integration boundary"],
-            data_flows=["Validated requests flow through the application service to approved dependencies."],
-            nfr_mapping=["Security: least privilege and secret management.", "Reliability: observable failures and recovery."],
-        )
+        return ArchitectureArtifact(**common, **body)
     if role == "poc_planner":
-        return PocArtifact(
-            **common,
-            scope=["Validate the highest-risk source-backed user journey.", "Use synthetic data and a local test environment."],
-            modular_boundaries=["Presentation", "Core application logic", "External adapters"],
-            success_criteria=[
+        return PocArtifact(**common, **body)
+    if role == "tech_stack":
+        return TechStackArtifact(**common, **body)
+    raise ValueError(f"Unsupported specialist role: {role}")
+
+
+BODY_SPEC: dict[str, dict[str, str]] = {
+    "engineering_plan": {
+        "phases": "3-6 delivery phases specific to this BRD, each a short sentence",
+        "milestones": "3-6 measurable milestones tied to the BRD",
+        "risks": "3-6 concrete risks drawn from the BRD requirements and open questions",
+        "team_composition": "roles with headcount, e.g. 'Backend engineer x2'",
+        "reflection": "one sentence self-review of source coverage and assumptions",
+    },
+    "schedule": {
+        "estimates": "effort per phase of the upstream plan, e.g. 'Discovery: 1-2 weeks'",
+        "dependencies": "ordering constraints between phases or requirements",
+        "timeline": "overall timeline statement, marked illustrative",
+        "resource_allocation": "who is allocated to which phase",
+    },
+    "solution_architect": {
+        "components": "system components specific to this BRD",
+        "data_flows": "how data moves between the components",
+        "nfr_mapping": "non-functional requirements from the BRD mapped to design choices",
+    },
+    "poc_planner": {
+        "scope": "what the proof of concept includes and excludes",
+        "modular_boundaries": "module boundaries matching the architecture components",
+        "success_criteria": "measurable pass/fail criteria",
+    },
+    "tech_stack": {
+        "options": (
+            "2-3 stack options; each an object with string keys name, scalability, team_familiarity, "
+            "integration_risk, cost, rationale"
+        ),
+    },
+}
+
+
+def _template_body(role: str) -> dict[str, Any]:
+    if role == "engineering_plan":
+        return {
+            "phases": ["Discovery and validation", "Implementation", "Verification and rollout"],
+            "milestones": ["Requirements approved", "Prototype validated", "Release readiness reviewed"],
+            "risks": ["Unresolved requirements can change scope and estimates."],
+            "team_composition": ["Engineering lead", "Application engineer", "Quality engineer"],
+            "reflection": "Self-review confirms source requirement references and explicitly stated assumptions.",
+        }
+    if role == "schedule":
+        return {
+            "estimates": ["Discovery: 1–2 weeks", "Implementation: 2–4 weeks", "Validation: 1 week"],
+            "dependencies": ["Requirements approval precedes implementation.", "Implementation precedes validation."],
+            "timeline": ["Illustrative total: 4–7 weeks; re-estimate after scope approval."],
+            "resource_allocation": ["Small cross-functional team; availability to be confirmed."],
+        }
+    if role == "solution_architect":
+        return {
+            "components": ["User interface", "Application service", "Data and integration boundary"],
+            "data_flows": ["Validated requests flow through the application service to approved dependencies."],
+            "nfr_mapping": ["Security: least privilege and secret management.", "Reliability: observable failures and recovery."],
+        }
+    if role == "poc_planner":
+        return {
+            "scope": ["Validate the highest-risk source-backed user journey.", "Use synthetic data and a local test environment."],
+            "modular_boundaries": ["Presentation", "Core application logic", "External adapters"],
+            "success_criteria": [
                 "Complete the selected journey without a contract violation.",
                 "Record reproducible results and unresolved risks for EM review.",
             ],
-        )
+        }
     if role == "tech_stack":
-        return TechStackArtifact(
-            **common,
-            options=[
+        return {
+            "options": [
                 TechOption(
                     name="Python modular application",
                     scalability="Good for a bounded prototype; can split services later.",
@@ -173,9 +218,49 @@ def build_artifact(
                     cost="Higher and usage-dependent.",
                     rationale="Consider only when scale and governance needs are validated.",
                 ),
-            ],
-        )
+            ]
+        }
     raise ValueError(f"Unsupported specialist role: {role}")
+
+
+def _generated_body(
+    role: str,
+    provider: Provider,
+    brd: NormalizedBRD,
+    evidence: list[RetrievedChunk],
+    upstream_summary: str,
+    template: dict[str, Any],
+) -> dict[str, Any]:
+    """Ask the provider for the role's content; keep only fields that validate, else use the template."""
+    generate = getattr(provider, "body", None)
+    if generate is None:
+        return {}
+    requirements = "\n".join(f"{item.requirement_id}: {item.text}" for item in brd.requirements)
+    evidence_text = "\n".join(f"[{chunk.chunk_id}] {chunk.text[:600]}" for chunk in evidence[:3])
+    context = (
+        f"BRD title: {brd.title}\nRequirements:\n{requirements}\n\n"
+        f"Retrieved organizational evidence:\n{evidence_text}\n\nUpstream context:\n{upstream_summary}"
+    )
+    try:
+        raw = generate(role, context, BODY_SPEC[role])
+    except ValueError:
+        return {}
+    accepted: dict[str, Any] = {}
+    for field, default in template.items():
+        value = raw.get(field)
+        if field == "reflection":
+            if isinstance(value, str) and value.strip():
+                accepted[field] = value.strip()
+        elif field == "options":
+            try:
+                options = [TechOption.model_validate(item) for item in value]
+            except (TypeError, ValueError):
+                continue
+            if 2 <= len(options) <= 3:
+                accepted[field] = options
+        elif isinstance(value, list) and value and all(isinstance(item, str) and item.strip() for item in value):
+            accepted[field] = [item.strip() for item in value][:8]
+    return accepted
 
 
 def revise_artifact(

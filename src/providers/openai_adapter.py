@@ -46,6 +46,32 @@ class OpenAIProvider:
         )
         return response.choices[0].message.content or ""
 
+    def body(self, role: str, context: str, fields: dict[str, str]) -> dict:
+        spec = "\n".join(f"- {name}: {description}" for name, description in fields.items())
+        response = self._client.chat.completions.create(
+            model=self.generation_model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        f"You are the {role.replace('_', ' ')} agent in an engineering-planning workflow. "
+                        "Return one JSON object with exactly the requested keys. Every list value must be a "
+                        "list of short strings (except where an object list is specified). Base content only "
+                        "on the supplied BRD requirements, retrieved evidence, and upstream context; be specific "
+                        "to this BRD and reference requirement IDs where useful. Do not invent citations, "
+                        "facts, or requirements. Mark estimates as illustrative and unknowns as TBD."
+                    ),
+                },
+                {"role": "user", "content": f"Keys to return:\n{spec}\n\n{context}"},
+            ],
+            temperature=0,
+            response_format={"type": "json_object"},
+        )
+        data = _parse_json(response.choices[0].message.content)
+        if not isinstance(data, dict):
+            raise ValueError("Provider body response was not a JSON object.")
+        return data
+
     def judge(self, artifact_summary: str, deterministic_score: ArtifactScore) -> JudgeAssessment:
         response = self._client.chat.completions.create(
             model=self.evaluation_model,
@@ -70,9 +96,14 @@ class OpenAIProvider:
             temperature=0,
             response_format={"type": "json_object"},
         )
-        content = (response.choices[0].message.content or "{}").strip()
-        if content.startswith("```"):
-            content = content.strip("`").removeprefix("json").strip()
-        data = json.loads(content)
+        content = response.choices[0].message.content
+        data = _parse_json(content)
         data["artifact_id"] = deterministic_score.artifact_id
         return JudgeAssessment.model_validate(data)
+
+
+def _parse_json(content: str | None):
+    text = (content or "{}").strip()
+    if text.startswith("```"):
+        text = text.strip("`").removeprefix("json").strip()
+    return json.loads(text)

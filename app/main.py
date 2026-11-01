@@ -6,6 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
+from src.contracts.schemas import Artifact
 from src.orchestration.graph import run_workflow
 from src.providers.gemini_adapter import GeminiProvider
 from src.providers.openai_adapter import OpenAIProvider
@@ -14,6 +15,57 @@ from src.tools.export import export_markdown
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_BRD = ROOT / "data" / "sample_brd.md"
+
+
+def _render_artifact_content(artifact: Artifact) -> None:
+    fields = {
+        "engineering_plan": (
+            ("Phases", "phases"),
+            ("Milestones", "milestones"),
+            ("Risks", "risks"),
+            ("Team composition", "team_composition"),
+            ("Self-review", "reflection"),
+        ),
+        "schedule": (
+            ("Effort estimates", "estimates"),
+            ("Dependencies", "dependencies"),
+            ("Timeline", "timeline"),
+            ("Resource allocation", "resource_allocation"),
+        ),
+        "solution_architect": (
+            ("System components", "components"),
+            ("Data flows", "data_flows"),
+            ("Non-functional requirements mapping", "nfr_mapping"),
+        ),
+        "poc_planner": (
+            ("PoC scope", "scope"),
+            ("Modular boundaries", "modular_boundaries"),
+            ("Success criteria", "success_criteria"),
+        ),
+    }
+    if artifact.role == "tech_stack":
+        st.markdown("#### Tech-stack recommendations")
+        for index, option in enumerate(artifact.options, start=1):
+            st.markdown(f"**Option {index}: {option.name}**")
+            for label, value in (
+                ("Scalability", option.scalability),
+                ("Team familiarity", option.team_familiarity),
+                ("Integration risk", option.integration_risk),
+                ("Cost", option.cost),
+                ("Rationale", option.rationale),
+            ):
+                st.markdown(f"- **{label}:** {value}")
+        return
+
+    st.markdown(f"#### {artifact.role.replace('_', ' ').title()}")
+    for label, attribute in fields[artifact.role]:
+        value = getattr(artifact, attribute)
+        st.markdown(f"**{label}**")
+        if isinstance(value, list):
+            st.markdown("\n".join(f"- {item}" for item in value))
+        else:
+            st.write(value)
+
 
 st.set_page_config(page_title="BRD-to-engineering prototype", layout="wide")
 st.title("BRD → engineering review")
@@ -128,8 +180,9 @@ if result is not None:
                 st.write(artifact.assumptions)
                 st.write("**Uncertainties**")
                 st.write([item.model_dump(mode="json") for item in artifact.uncertainties])
-                st.write("**Artifact details**")
-                st.json(artifact.model_dump(mode="json"))
+                _render_artifact_content(artifact)
+                with st.expander("Raw artifact JSON"):
+                    st.json(artifact.model_dump(mode="json"))
 
     with tabs[1]:
         st.download_button(
